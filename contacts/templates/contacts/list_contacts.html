@@ -1,7 +1,13 @@
-{% extends 'contacts/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 {% if contacts %}
+<h2>
+    Contacts
+    <a href="{% url 'contacts:new_contact' %}">
+      <span class="glyphicon glyphicon-plus"></span>
+    </a>
+</h2>
   {% for contact in contacts %}
     <h3>
       <a href="{% url 'contacts:view_contact' id=contact.id %}">

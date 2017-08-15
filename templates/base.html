@@ -13,10 +13,9 @@
       <a href="{% url 'logout' %}" class="top-menu">
         <span class="glyphicon glyphicon-log-out"></span>
       </a>
-      <a href="{% url 'contacts:new_contact' %}" class="top-menu">
-        <span class="glyphicon glyphicon-plus"></span>
-      </a>
-      <h1><a href="{% url 'contacts:list_contacts' %}">Contacts</a></h1>
+      <a href="{% url 'invoice:invoice_list' %}" class="top-menu">Invoices</a>
+      <a href="{% url 'contacts:list_contacts' %}" class="top-menu">Contacts</a>
+      <h1>Littlebooks</h1>
     </div>
     <div class="content container">
       <div class="row">
