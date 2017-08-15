@@ -1,0 +1,11 @@
+{% extends 'contacts/base.html' %}
+
+{% block content %}
+  <a class="btn btn-warning" href="{% url 'contacts:edit_contact' id=contact.id %}">
+    <span class="glyphicon glyphicon-pencil"></span>
+  </a>
+   <a class="btn btn-danger" href="{% url 'contacts:delete_contact' id=contact.id %}">
+    <span class="glyphicon glyphicon-trash"></span>
+  </a>
+  <h2>{{ contact }}</h2>
+{% endblock %}

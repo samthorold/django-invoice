@@ -1,0 +1,13 @@
+{% extends 'contacts/base.html' %}
+
+{% block content %}
+{% if contacts %}
+  {% for contact in contacts %}
+    <h3>
+      <a href="{% url 'contacts:view_contact' id=contact.id %}">
+        {{ contact }}
+      </a>
+    </h3>
+  {% endfor %}
+{% endif %}
+{% endblock %}
