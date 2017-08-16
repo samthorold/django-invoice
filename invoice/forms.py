@@ -15,6 +15,10 @@ class InvoiceForm(forms.ModelForm):
         model = Invoice
         fields = ('payee',)
 
+class InvoiceSearchForm(forms.Form):
+    payee_name = forms.CharField(required=False, max_length=200)
+    patient_name = forms.CharField(required=False, max_length=200)
+
 class InvoiceLineForm(forms.ModelForm):
 
     class Meta:

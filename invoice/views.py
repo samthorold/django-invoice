@@ -1,13 +1,27 @@
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-from .forms import DeleteForm, InvoiceForm, InvoiceLineForm, PaymentForm, WorkTypeForm
+from .forms import (
+    DeleteForm, InvoiceForm, InvoiceLineForm, InvoiceSearchForm,
+    PaymentForm, WorkTypeForm
+)
 from .models import Invoice, InvoiceLine, Payment, WorkType
 
 
 def invoice_list(request):
-    invoices = Invoice.objects.all()
+    invoices = Invoice.objects
+    payee = request.GET.get('payee')
+    if payee:
+        invoices = invoices.filter(payee__name__icontains=payee)
+    patient = request.GET.get('patient')
+    if patient:
+        # https://stackoverflow.com/questions/15507171/django-filter-query-foreign-key
+        invoices = invoices.filter(invoiceline__patient__name__icontains=patient)
+    if not (payee or patient):
+        invoices = invoices.all()
     return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
 
 def invoice_new(request):
@@ -20,6 +34,19 @@ def invoice_new(request):
     else:
         form = InvoiceForm()
         return render(request, 'invoice/invoice_new.html', {'form': form})
+
+def invoice_search(request):
+    if request.method == 'POST':
+        form = InvoiceSearchForm(request.POST)
+        if form.is_valid():
+            payee = form.cleaned_data.get('payee_name')
+            patient = form.cleaned_data.get('patient_name')
+            url = reverse('invoice:invoice_list')
+            url = "{}?payee={}&patient={}".format(url, payee, patient)
+            return HttpResponseRedirect(url)
+    else:
+        form = InvoiceSearchForm()
+        return render(request, 'invoice/invoice_search.html', {'form': form})
 
 def invoice_detail(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)

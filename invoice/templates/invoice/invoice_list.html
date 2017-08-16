@@ -6,6 +6,9 @@
   <a href="{% url 'invoice:invoice_new' %}">
     <span class="glyphicon glyphicon-plus"></span>
   </a>
+  <a href="{% url 'invoice:invoice_search' %}">
+    <span class="glyphicon glyphicon-search"></span>
+  </a>
 </h2>
 {% if invoices %}
   {% for invoice in invoices %}

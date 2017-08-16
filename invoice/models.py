@@ -14,6 +14,7 @@ class WorkType(models.Model):
 class Invoice(models.Model):
 
 	payee = models.ForeignKey('contacts.Contact')
+	notes = models.TextField(blank=True)
 
 	def __str__(self):
 		return self.payee.name
