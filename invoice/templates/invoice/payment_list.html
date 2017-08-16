@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>
+  Payments
+</h2>
+{% if payments %}
+  {% for payment in payments %}
+    <h3>
+      <a href="{% url 'invoice:invoice_detail' pk=payment.invoice.id %}">
+        {{ payment }}
+      </a>
+    </h3>
+  {% endfor %}
+{% endif %}
+{% endblock %}

@@ -3,6 +3,9 @@ from django.db import models
 
 class WorkType(models.Model):
 
+	class Meta:
+		ordering = ('name',)
+
 	name = models.CharField(max_length=200)
 
 	def __str__(self):
@@ -17,6 +20,9 @@ class Invoice(models.Model):
 
 class InvoiceLine(models.Model):
 
+	class Meta:
+		ordering = ('-billable', 'work_type')
+
 	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 	work_type = models.ForeignKey(WorkType)
 	patient = models.ForeignKey('contacts.Contact')
@@ -28,6 +34,9 @@ class InvoiceLine(models.Model):
 		return "{}: {}".format(self.work_type.name, self.patient.name)
 
 class Payment(models.Model):
+
+	class Meta:
+		ordering = ('date', 'amount')
 
 	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 	date = models.DateField()

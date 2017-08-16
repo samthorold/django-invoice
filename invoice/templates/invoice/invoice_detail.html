@@ -4,7 +4,7 @@
   <a class="btn btn-warning" href="{% url 'invoice:invoice_edit' pk=invoice.id %}">
     <span class="glyphicon glyphicon-pencil"></span>
   </a>
-   <a class="btn btn-danger" href="{% url 'invoice:invoice_delete' pk=invoice.id %}">
+  <a class="btn btn-danger" href="{% url 'invoice:invoice_delete' pk=invoice.id %}">
     <span class="glyphicon glyphicon-trash"></span>
   </a>
   <h2>{{ invoice }}</h2>
@@ -13,8 +13,8 @@
       <tr>
         <th class="text-left">Patient</th>
         <th class="text-left">Work Type</th>
-        <th class="text-center">#</th>
-        <th class="text-center">Fee</th>
+        <th class="text-right">#</th>
+        <th class="text-right">Fee</th>
         <th class="text-center">Billable</th>
       </tr>
     </thead>
@@ -23,16 +23,64 @@
         <tr>
           <td class="text-left">{{ il.patient.name }}</td>
           <td class="text-left">{{ il.work_type.name }}</td>
-          <td class="text-center">{{ il.quantity }}</td>
-          <td class="text-center">{{ il.fee }}</td>
-          <td class="text-center">{{ il.billable }}</td>
+          <td class="text-right">{{ il.quantity }}</td>
+          <td class="text-right">{{ il.fee }}</td>
+          <td class="text-center">
+            {% if il.billable %}
+              <span class="glyphicon glyphicon-ok"></span>
+            {% else %}
+              <span class="glyphicon glyphicon-remove"></span>
+            {% endif %}
+          </td>
+          <td class="text-center">
+            <a class="btn btn-warning" href="{% url 'invoice:invoice_line_edit' pk=il.id %}">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
+          </td>
+          <td class="text-center">
+            <a class="btn btn-danger" href="{% url 'invoice:invoice_line_delete' pk=il.id %}">
+              <span class="glyphicon glyphicon-trash"></span>
+            </a>
+          </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  <h2>
+  <h4>
     <a href="{% url 'invoice:invoice_line_new' invoice_pk=invoice.id %}">
-      <span class="glyphicon glyphicon-plus"></span>
+      <span class="glyphicon glyphicon-plus"></span> Invoice Line
     </a>
-  </h2>
+  </h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Payment Date</th>
+        <th class="text-right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in invoice.payment_set.all %}
+        <tr>
+          <td class="text-center">{{ p.date }}</td>
+          <td class="text-right">{{ p.amount }}</td>
+          <td class="text-center">
+            <a class="btn btn-warning" href="{% url 'invoice:payment_edit' pk=p.id %}">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
+          </td>
+          <td class="text-center">
+            <a class="btn btn-danger" href="{% url 'invoice:payment_delete' pk=p.id %}">
+              <span class="glyphicon glyphicon-trash"></span>
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h4>
+    <a href="{% url 'invoice:payment_new' invoice_pk=invoice.id %}">
+      <span class="glyphicon glyphicon-plus"></span> Payment
+    </a>
+  </h4>
 {% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>
+  Work Types
+  <a href="{% url 'invoice:worktype_new' %}">
+    <span class="glyphicon glyphicon-plus"></span>
+  </a>
+</h2>
+{% if worktypes %}
+  {% for worktype in worktypes %}
+    <h3>
+      <a href="{% url 'invoice:worktype_detail' pk=worktype.id %}">
+        {{ worktype }}
+      </a>
+    </h3>
+  {% endfor %}
+{% endif %}
+{% endblock %}

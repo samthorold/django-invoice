@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <h1>Delete Payment</h1>
+  <h3>
+    Type the invoice payee's name, "{{ payment.invoice.payee.name }}", to delete the payment.
+  </h3>
+  <form method="POST" class="post-form">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-danger">Delete</button>
+  </form>
+
+{% endblock %}

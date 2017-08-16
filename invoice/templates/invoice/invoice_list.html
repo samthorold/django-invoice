@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h2>
+  Invoices
+  <a href="{% url 'invoice:invoice_new' %}">
+    <span class="glyphicon glyphicon-plus"></span>
+  </a>
+</h2>
 {% if invoices %}
   {% for invoice in invoices %}
     <h3>

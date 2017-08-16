@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <h1>Delete Invoice Line</h1>
+  <h3>
+    Type the invoice payee's name, "{{ invoice_line.invoice.payee.name }}", to delete the invoice line.
+  </h3>
+  <form method="POST" class="post-form">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-danger">Delete</button>
+  </form>
+
+{% endblock %}

@@ -28,3 +28,7 @@ class PaymentForm(forms.ModelForm):
         model = Payment
         # add the Invoice from the view
         fields = ('date', 'amount')
+
+class DeleteForm(forms.Form):
+
+    entry = forms.CharField()

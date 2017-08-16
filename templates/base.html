@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title>Contacts</title>
+    <title>Littlebooks</title>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <link href="//fonts.googleapis.com/css?family=Open+Sans&subset=latin,latin-ext" rel="stylesheet" type="text/css">
@@ -10,9 +10,9 @@
   </head>
   <body>
     <div class="page-header">
-      <a href="{% url 'logout' %}" class="top-menu">
-        <span class="glyphicon glyphicon-log-out"></span>
-      </a>
+      <a href="{% url 'logout' %}" class="top-menu"><span class="glyphicon glyphicon-log-out"></span></a>
+      <a href="{% url 'invoice:worktype_list' %}" class="top-menu">Work Types</a>
+      <a href="{% url 'invoice:payment_list' %}" class="top-menu">Payments</a>
       <a href="{% url 'invoice:invoice_list' %}" class="top-menu">Invoices</a>
       <a href="{% url 'contacts:list_contacts' %}" class="top-menu">Contacts</a>
       <h1>Littlebooks</h1>

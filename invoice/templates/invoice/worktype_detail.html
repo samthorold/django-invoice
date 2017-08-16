@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <a class="btn btn-warning" href="{% url 'invoice:worktype_edit' pk=worktype.id %}">
+    <span class="glyphicon glyphicon-pencil"></span>
+  </a>
+  <a class="btn btn-danger" href="{% url 'invoice:worktype_delete' pk=worktype.id %}">
+    <span class="glyphicon glyphicon-trash"></span>
+  </a>
+  <h2>{{ worktype }}</h2>
+
+{% endblock %}
