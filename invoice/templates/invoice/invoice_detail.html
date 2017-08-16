@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <a class="btn btn-warning" href="{% url 'invoice:invoice_edit' pk=invoice.id %}">
+    <span class="glyphicon glyphicon-pencil"></span>
+  </a>
+   <a class="btn btn-danger" href="{% url 'invoice:invoice_delete' pk=invoice.id %}">
+    <span class="glyphicon glyphicon-trash"></span>
+  </a>
+  <h2>{{ invoice }}</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-left">Patient</th>
+        <th class="text-left">Work Type</th>
+        <th class="text-center">#</th>
+        <th class="text-center">Fee</th>
+        <th class="text-center">Billable</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for il in invoice.invoiceline_set.all %}
+        <tr>
+          <td class="text-left">{{ il.patient.name }}</td>
+          <td class="text-left">{{ il.work_type.name }}</td>
+          <td class="text-center">{{ il.quantity }}</td>
+          <td class="text-center">{{ il.fee }}</td>
+          <td class="text-center">{{ il.billable }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h2>
+    <a href="{% url 'invoice:invoice_line_new' invoice_pk=invoice.id %}">
+      <span class="glyphicon glyphicon-plus"></span>
+    </a>
+  </h2>
+{% endblock %}

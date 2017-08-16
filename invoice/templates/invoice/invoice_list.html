@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if invoices %}
+  {% for invoice in invoices %}
+    <h3>
+      <a href="{% url 'invoice:invoice_detail' pk=invoice.id %}">
+        {{ invoice }}
+      </a>
+    </h3>
+  {% endfor %}
+{% endif %}
+{% endblock %}
