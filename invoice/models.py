@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class WorkType(models.Model):
@@ -29,6 +30,9 @@ class Invoice(models.Model):
 		if end:
 			payments = payments.filter(date__lte=end)
 		return sum(p.amount for p in payments.all())
+
+	def fee_oustanding(self):
+		return self.total_fee() - self.total_payment()
 
 class InvoiceLine(models.Model):
 

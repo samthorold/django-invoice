@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
 from .forms import (
     DeleteForm, InvoiceForm, InvoiceLineForm, InvoiceSearchForm,
-    PaymentForm, WorkTypeForm
+    PaymentForm, PaymentSearchForm, WorkTypeForm
 )
 from .models import Invoice, InvoiceLine, Payment, WorkType
 from contacts.models import Contact
@@ -23,7 +24,20 @@ def invoice_list(request):
         invoices = invoices.filter(invoiceline__patient__name__icontains=patient)
     if not (payee or patient):
         invoices = invoices.all()
-    return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
+
+    # https://stackoverflow.com/questions/5728283/
+    # distinct returns only unique Invoice objects
+    # the same Invoice shows up when two+ InvoiceLine objects have a matching patient name
+    paginator = Paginator(invoices.distinct(), 25)
+    page = request.GET.get('page')
+    try:
+        invoices = paginator.page(page)
+    except PageNotAnInteger:
+        invoices = paginator.page(1)
+    except EmptyPage:
+        invoices = paginator.page(paginator.num_pages)
+    return render(request, 'invoice/invoice_list.html',
+        {'invoices': invoices, 'patient': patient, 'payee': payee})
 
 def invoice_new(request):
     if request.method == 'POST':
@@ -63,7 +77,7 @@ def invoice_edit(request, pk):
             return redirect('invoice:invoice_detail', pk=invoice.id)
     else:
         form = InvoiceForm(instance=invoice)
-        return render(request, 'invoice/invoice_edit.html', {'form', form})
+        return render(request, 'invoice/invoice_edit.html', {'form': form})
 
 def invoice_delete(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
@@ -146,6 +160,9 @@ def worktype_new(request):
         form = WorkTypeForm()
         return render(request, 'invoice/worktype_new.html', {'form': form})
 
+def worktype_search(request):
+    pass
+
 def worktype_detail(request, pk):
     worktype = get_object_or_404(WorkType, pk=pk)
     return render(request, 'invoice/worktype_detail.html', {'worktype': worktype})
@@ -158,6 +175,9 @@ def worktype_edit(request, pk):
             worktype = form.save()
             messages.success(request, 'Success, changes saved :)')
             return redirect('invoice:worktype_list')
+    else:
+        form = WorkTypeForm(instance=worktype)
+        return render(request, 'invoice/worktype_edit.html', {'form': form})
 
 def worktype_delete(request, pk):
     worktype = get_object_or_404(WorkType, pk=pk)
@@ -183,9 +203,12 @@ def payment_list(request):
     Payments by Payee
     """
 
-    payees = [(c, c.total_payments()) for c in Contact.objects.all()]
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    payees = [(c, c.total_payments(start, end)) for c in Contact.objects.all()]
     payees = [payment_tuple for payment_tuple in payees if payment_tuple[1]>0]
-    return render(request, 'invoice/payment_list.html', {'payees': payees})
+    return render(request, 'invoice/payment_list.html',
+        {'payees': payees, 'start': start, 'end': end})
 
 def payment_new(request, invoice_pk):
     invoice = get_object_or_404(Invoice, pk=invoice_pk)
@@ -202,6 +225,18 @@ def payment_new(request, invoice_pk):
         form = PaymentForm()
         return render(request, 'invoice/payment_new.html', {'form': form})
 
+def payment_search(request):
+    if request.method == 'POST':
+        form = PaymentSearchForm(request.POST)
+        if form.is_valid():
+            start = form.cleaned_data.get('start')
+            end = form.cleaned_data.get('end')
+            url = reverse('invoice:payment_list')
+            url = "{}?start={}&end={}".format(url, start, end).replace('None', '')
+            return HttpResponseRedirect(url)
+    else:
+        form = PaymentSearchForm()
+        return render(request, 'invoice/payment_search.html', {'form': form})
 
 def payment_edit(request, pk):
     payment = get_object_or_404(Payment, pk=pk)

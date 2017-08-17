@@ -1,8 +1,11 @@
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-from .forms import ContactForm
+from .forms import ContactForm, ContactSearchForm
 from .models import Contact
 
 
@@ -20,13 +23,39 @@ def new_contact(request):
 
 @login_required
 def list_contacts(request):
-	contacts = Contact.objects.order_by('name')
-	return render(request, 'contacts/list_contacts.html', {'contacts': contacts})
+	contacts = Contact.objects.all()
+	name = request.GET.get('name')
+	if name:
+		contacts = contacts.filter(name__icontains=name)
+
+	paginator = Paginator(contacts, 25)
+	page = request.GET.get('page')
+	try:
+		contacts = paginator.page(page)
+	except PageNotAnInteger:
+		contacts = paginator.page(1)
+	except EmptyPage:
+		contacts = paginator.page(paginator.num_pages)
+	return render(request, 'contacts/list_contacts.html',
+		{'contacts': contacts, 'name': name})
 
 @login_required
 def view_contact(request, id):
 	contact = get_object_or_404(Contact, pk=id)
 	return render(request, 'contacts/view_contact.html', {'contact': contact})
+
+@login_required
+def contact_search(request):
+	if request.method == 'POST':
+		form = ContactSearchForm(request.POST)
+		if form.is_valid():
+			name = form.cleaned_data.get('name')
+			url = reverse('contacts:list_contacts')
+			url = "{}?name={}".format(url, name)
+			return HttpResponseRedirect(url)
+	else:
+		form = ContactSearchForm()
+		return render(request, 'contacts/contact_search.html', {'form': form})
 
 @login_required
 def edit_contact(request, id):

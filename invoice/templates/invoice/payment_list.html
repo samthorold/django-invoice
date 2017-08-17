@@ -3,6 +3,16 @@
 {% block content %}
 <h2>
   Payments
+  <a href="{% url 'invoice:payment_search' %}">
+    <span class="glyphicon glyphicon-filter"></span>
+  </a>
+
+  {% if start %}
+    <small>Start: </small>{{ start }}  
+  {% endif %}
+  {% if end %}
+    <small>End: </small>{{ end }}
+  {% endif %}
 </h2>
 <table class="table">
   <thead>

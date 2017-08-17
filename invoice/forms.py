@@ -13,7 +13,7 @@ class InvoiceForm(forms.ModelForm):
 
     class Meta:
         model = Invoice
-        fields = ('payee',)
+        fields = ('payee', 'notes')
 
 class InvoiceSearchForm(forms.Form):
     payee_name = forms.CharField(required=False, max_length=200)
@@ -32,6 +32,10 @@ class PaymentForm(forms.ModelForm):
         model = Payment
         # add the Invoice from the view
         fields = ('date', 'amount')
+
+class PaymentSearchForm(forms.Form):
+    start = forms.DateField(required=False)
+    end = forms.DateField(required=False)
 
 class DeleteForm(forms.Form):
 

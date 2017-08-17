@@ -7,7 +7,8 @@
   <a class="btn btn-danger" href="{% url 'invoice:invoice_delete' pk=invoice.id %}">
     <span class="glyphicon glyphicon-trash"></span>
   </a>
-  <h2>{{ invoice }}</h2>
+  <h2>{{ invoice }} | {{ invoice.total_payment }} of {{ invoice.total_fee }} paid</h2>
+  <p>{{ invoice.notes|linebreaksbr }}</p>
   <table class="table">
     <thead>
       <tr>

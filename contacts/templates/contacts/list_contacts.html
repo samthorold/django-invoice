@@ -3,10 +3,13 @@
 {% block content %}
 {% if contacts %}
 <h2>
-    Contacts
-    <a href="{% url 'contacts:new_contact' %}">
-      <span class="glyphicon glyphicon-plus"></span>
-    </a>
+  Contacts
+  <a href="{% url 'contacts:new_contact' %}">
+    <span class="glyphicon glyphicon-plus"></span>
+  </a>
+  <a href="{% url 'contacts:contact_search' %}">
+    <span class="glyphicon glyphicon-search"></span>
+  </a>
 </h2>
   {% for contact in contacts %}
     <h3>
@@ -16,4 +19,19 @@
     </h3>
   {% endfor %}
 {% endif %}
+<div class="pagination">
+  <span class="step-links">
+    {% if contacts.has_previous %}
+      <a href="?page={{ contacts.previous_page_number }}{% if name %}&name={{ name }}{% endif %}">Previous</a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+    </span>
+
+    {% if contacts.has_next %}
+      <a href="?page={{ contacts.next_page_number }}{% if name %}&name={{ name }}{% endif %}">Next</a>
+    {% endif %}
+  </span>
+</div>
 {% endblock %}

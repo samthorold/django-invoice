@@ -32,4 +32,20 @@
     {% endfor %}
   </tbody>
 </table>
+
+<div class="pagination">
+  <span class="step-links">
+    {% if invoices.has_previous %}
+      <a href="?page={{ invoices.previous_page_number }}{% if patient %}&patient={{ patient }}{% endif %}{% if payee %}&payee={{ payee }}{% endif %}">Previous</a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ invoices.number }} of {{ invoices.paginator.num_pages }}.
+    </span>
+
+    {% if invoices.has_next %}
+      <a href="?page={{ invoices.next_page_number }}{% if patient %}&patient={{ patient }}{% endif %}{% if payee %}&payee={{ payee }}{% endif %}">Next</a>
+    {% endif %}
+  </span>
+</div>
 {% endblock %}

@@ -6,6 +6,9 @@
   <a href="{% url 'invoice:worktype_new' %}">
     <span class="glyphicon glyphicon-plus"></span>
   </a>
+  <a href="{% url 'invoice:worktype_search' %}">
+    <span class="glyphicon glyphicon-filter"></span>
+  </a>
 </h2>
 {% if worktypes %}
   {% for worktype in worktypes %}

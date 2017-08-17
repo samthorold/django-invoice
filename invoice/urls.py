@@ -19,12 +19,14 @@ urlpatterns = [
 
 	url(r'^worktypes/$', views.worktype_list, name='worktype_list'),
 	url(r'^worktypes/new/$', views.worktype_new, name='worktype_new'),
+	url(r'^worktypes/search/$', views.worktype_search, name='worktype_search'),
 	url(r'^worktypes/(?P<pk>[0-9]+)/$', views.worktype_detail, name='worktype_detail'),
 	url(r'^worktypes/(?P<pk>[0-9]+)/edit/$', views.worktype_edit, name='worktype_edit'),
 	url(r'^worktypes/(?P<pk>[0-9]+)/delete/$', views.worktype_delete, name='worktype_delete'),
 
 	url(r'^payments/$', views.payment_list, name='payment_list'),
 	url(r'^(?P<invoice_pk>[0-9]+)/payment_new/$', views.payment_new, name='payment_new'),
+	url(r'^payments/search/$', views.payment_search, name='payment_search'),
 	url(r'^payments/(?P<pk>[0-9]+)/edit/$', views.payment_edit, name='payment_edit'),
 	url(r'^payments/(?P<pk>[0-9]+)/delete/$', views.payment_delete, name='payment_delete'),
 ]
