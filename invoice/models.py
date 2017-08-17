@@ -19,6 +19,17 @@ class Invoice(models.Model):
 	def __str__(self):
 		return self.payee.name
 
+	def total_fee(self):
+		return sum(il.total_fee() for il in self.invoiceline_set.all())
+
+	def total_payment(self, start=None, end=None):
+		payments = self.payment_set
+		if start:
+			payments = payments.filter(date__gte=start)
+		if end:
+			payments = payments.filter(date__lte=end)
+		return sum(p.amount for p in payments.all())
+
 class InvoiceLine(models.Model):
 
 	class Meta:
@@ -33,6 +44,11 @@ class InvoiceLine(models.Model):
 
 	def __str__(self):
 		return "{}: {}".format(self.work_type.name, self.patient.name)
+
+	def total_fee(self, billable=True):
+		if billable and not self.billable:
+			return 0
+		return self.quantity * self.fee
 
 class Payment(models.Model):
 

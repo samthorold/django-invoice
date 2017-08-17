@@ -10,13 +10,26 @@
     <span class="glyphicon glyphicon-search"></span>
   </a>
 </h2>
-{% if invoices %}
-  {% for invoice in invoices %}
-    <h3>
-      <a href="{% url 'invoice:invoice_detail' pk=invoice.id %}">
-        {{ invoice }}
-      </a>
-    </h3>
-  {% endfor %}
-{% endif %}
+<table class="table">
+  <thead>
+    <tr>
+      <th class="text-left">Payee</th>
+      <th class="text-right">Paid</th>
+      <th class="text-right">Due</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for invoice in invoices %}
+      <tr>
+        <td class="text-left">
+          <a href="{% url 'invoice:invoice_detail' pk=invoice.id %}">
+            {{ invoice.payee.name }}
+          </a>
+        </td>
+        <td class="text-right">{{ invoice.total_payment }}</td>
+        <td class="text-right">{{ invoice.total_fee }}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

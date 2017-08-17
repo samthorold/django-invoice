@@ -10,3 +10,6 @@ class Contact(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	def total_payments(self, start=None, end=None):
+		return sum(i.total_payment(start, end) for i in self.invoice_set.all())

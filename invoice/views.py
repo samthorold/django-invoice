@@ -9,6 +9,7 @@ from .forms import (
     PaymentForm, WorkTypeForm
 )
 from .models import Invoice, InvoiceLine, Payment, WorkType
+from contacts.models import Contact
 
 
 def invoice_list(request):
@@ -178,8 +179,13 @@ def worktype_delete(request, pk):
             {'form': form, 'worktype': worktype})
 
 def payment_list(request):
-    payments = Payment.objects.all()
-    return render(request, 'invoice/payment_list.html', {'payments': payments})
+    """
+    Payments by Payee
+    """
+
+    payees = [(c, c.total_payments()) for c in Contact.objects.all()]
+    payees = [payment_tuple for payment_tuple in payees if payment_tuple[1]>0]
+    return render(request, 'invoice/payment_list.html', {'payees': payees})
 
 def payment_new(request, invoice_pk):
     invoice = get_object_or_404(Invoice, pk=invoice_pk)
