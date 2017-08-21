@@ -28,7 +28,7 @@ def list_contacts(request):
 	if name:
 		contacts = contacts.filter(name__icontains=name)
 
-	paginator = Paginator(contacts, 25)
+	paginator = Paginator(contacts, 10)
 	page = request.GET.get('page')
 	try:
 		contacts = paginator.page(page)

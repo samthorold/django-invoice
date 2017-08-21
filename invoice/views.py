@@ -7,14 +7,14 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import (
     DeleteForm, InvoiceForm, InvoiceLineForm, InvoiceSearchForm,
-    PaymentForm, PaymentSearchForm, WorkTypeForm
+    PaymentForm, PaymentSearchForm, WorkTypeForm, WorkTypeSearchForm
 )
 from .models import Invoice, InvoiceLine, Payment, WorkType
 from contacts.models import Contact
 
 
 def invoice_list(request):
-    invoices = Invoice.objects
+    invoices = Invoice.objects.order_by('-id')
     payee = request.GET.get('payee')
     if payee:
         invoices = invoices.filter(payee__name__icontains=payee)
@@ -22,13 +22,13 @@ def invoice_list(request):
     if patient:
         # https://stackoverflow.com/questions/15507171/django-filter-query-foreign-key
         invoices = invoices.filter(invoiceline__patient__name__icontains=patient)
-    if not (payee or patient):
-        invoices = invoices.all()
+    # if not (payee or patient):
+    #     invoices = invoices.all()
 
     # https://stackoverflow.com/questions/5728283/
     # distinct returns only unique Invoice objects
     # the same Invoice shows up when two+ InvoiceLine objects have a matching patient name
-    paginator = Paginator(invoices.distinct(), 25)
+    paginator = Paginator(invoices.distinct(), 15)
     page = request.GET.get('page')
     try:
         invoices = paginator.page(page)
@@ -146,8 +146,12 @@ def invoice_line_delete(request, pk):
             {'form': form, 'invoice_line': invoice_line})
 
 def worktype_list(request):
-    worktypes = WorkType.objects.all()
-    return render(request, 'invoice/worktype_list.html', {'worktypes': worktypes})
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    worktypes = [(w, w.total_fees(start, end)) for w in WorkType.objects.all()]
+    worktypes = [worktype_tuple for worktype_tuple in worktypes if worktype_tuple[1]>0]
+    return render(request, 'invoice/worktype_list.html',
+        {'worktypes': worktypes, 'start': start, 'end': end})
 
 def worktype_new(request):
     if request.method == 'POST':
@@ -161,7 +165,17 @@ def worktype_new(request):
         return render(request, 'invoice/worktype_new.html', {'form': form})
 
 def worktype_search(request):
-    pass
+    if request.method == 'POST':
+        form = WorkTypeSearchForm(request.POST)
+        if form.is_valid():
+            start = form.cleaned_data.get('start')
+            end = form.cleaned_data.get('end')
+            url = reverse('invoice:worktype_list')
+            url = "{}?start={}&end={}".format(url, start, end).replace('None', '')
+            return HttpResponseRedirect(url)
+    else:
+        form = WorkTypeSearchForm()
+        return render(request, 'invoice/worktype_search.html', {'form': form})
 
 def worktype_detail(request, pk):
     worktype = get_object_or_404(WorkType, pk=pk)

@@ -12,6 +12,14 @@ class WorkType(models.Model):
 	def __str__(self):
 		return self.name
 
+	def total_fees(self, start=None, end=None):
+		fees = self.invoiceline_set
+		if start:
+			fees = fees.filter(date__gte=start)
+		if end:
+			fees = fees.filter(date__lte=end)
+		return sum(il.total_fee(billable=False) for il in fees.all())
+
 class Invoice(models.Model):
 
 	payee = models.ForeignKey('contacts.Contact')
@@ -31,7 +39,7 @@ class Invoice(models.Model):
 			payments = payments.filter(date__lte=end)
 		return sum(p.amount for p in payments.all())
 
-	def fee_oustanding(self):
+	def fee_outstanding(self):
 		return self.total_fee() - self.total_payment()
 
 class InvoiceLine(models.Model):
@@ -44,6 +52,7 @@ class InvoiceLine(models.Model):
 	patient = models.ForeignKey('contacts.Contact')
 	quantity = models.IntegerField()
 	fee = models.IntegerField()
+	date = models.DateField(default=timezone.now)
 	billable = models.BooleanField()
 
 	def __str__(self):
@@ -60,7 +69,7 @@ class Payment(models.Model):
 		ordering = ('date', 'amount')
 
 	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
-	date = models.DateField()
+	date = models.DateField(default=timezone.now)
 	amount = models.IntegerField()
 
 	def __str__(self):

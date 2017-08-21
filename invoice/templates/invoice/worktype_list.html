@@ -9,14 +9,28 @@
   <a href="{% url 'invoice:worktype_search' %}">
     <span class="glyphicon glyphicon-filter"></span>
   </a>
+
+  {% if start %}
+    <small>Start: </small>{{ start }}  
+  {% endif %}
+  {% if end %}
+    <small>End: </small>{{ end }}
+  {% endif %}
 </h2>
-{% if worktypes %}
-  {% for worktype in worktypes %}
-    <h3>
-      <a href="{% url 'invoice:worktype_detail' pk=worktype.id %}">
-        {{ worktype }}
-      </a>
-    </h3>
-  {% endfor %}
-{% endif %}
+<table class="table">
+  <thead>
+    <tr>
+      <th class="text-left">Work Type</th>
+      <th class="text-right">Fees/Charge</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for worktype in worktypes %}
+      <tr>
+        <td class="text-left">{{ worktype.0 }}</td>
+        <td class="text-right">{{ worktype.1 }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

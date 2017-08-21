@@ -24,7 +24,7 @@ class InvoiceLineForm(forms.ModelForm):
     class Meta:
         model = InvoiceLine
         # add the Invoice from the view
-        fields = ('patient', 'work_type', 'fee', 'quantity', 'billable')
+        fields = ('patient', 'work_type', 'fee', 'quantity', 'date', 'billable')
 
 class PaymentForm(forms.ModelForm):
 
@@ -34,6 +34,10 @@ class PaymentForm(forms.ModelForm):
         fields = ('date', 'amount')
 
 class PaymentSearchForm(forms.Form):
+    start = forms.DateField(required=False)
+    end = forms.DateField(required=False)
+
+class WorkTypeSearchForm(forms.Form):
     start = forms.DateField(required=False)
     end = forms.DateField(required=False)
 
