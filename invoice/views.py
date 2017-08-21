@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -154,6 +155,14 @@ def invoice_line_delete(request, pk):
             {'form': form, 'invoice_line': invoice_line})
 
 @login_required
+def invoice_line_send_invoice_now(request, pk):
+    invoice_line = get_object_or_404(InvoiceLine, pk=pk)
+    invoice_line.invoice_sent_date = timezone.now()
+    invoice_line.save()
+    messages.success(request, 'Success, changes were saved :)')
+    return redirect('invoice:invoice_detail', pk=invoice_line.invoice.id)
+
+@login_required
 def worktype_list(request):
     start = request.GET.get('start')
     end = request.GET.get('end')
@@ -235,8 +244,13 @@ def payment_list(request):
 
     start = request.GET.get('start')
     end = request.GET.get('end')
-    payees = [(c, c.total_payments(start, end)) for c in Contact.objects.all()]
+    payees = [
+        (c, c.total_payments(start, end), c.total_invoiced(start, end), c.total_fees(start, end))
+        for c in Contact.objects.all()
+    ]
+
     payees = [payment_tuple for payment_tuple in payees if payment_tuple[1]>0]
+
     return render(request, 'invoice/payment_list.html',
         {'payees': payees, 'start': start, 'end': end})
 

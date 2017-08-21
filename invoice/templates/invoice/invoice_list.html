@@ -15,8 +15,10 @@
   <thead>
     <tr>
       <th class="text-left">Payee</th>
-      <th class="text-right">Paid</th>
-      <th class="text-right">Due</th>
+      <th class="text-left">Patient</th>
+      <th class="text-right">Payments</th>
+      <th class="text-right">Total Invoiced</th>
+      <th class="text-right">Total Fees</th>
     </tr>
   </thead>
   <tbody>
@@ -27,7 +29,9 @@
             {{ invoice.payee.name }}
           </a>
         </td>
+        <td class="text-left">{{ invoice.patients_string }}</td>
         <td class="text-right">{{ invoice.total_payment|intcomma }}</td>
+        <td class="text-right">{{ invoice.total_invoiced|intcomma }}</td>
         <td class="text-right">{{ invoice.total_fee|intcomma }}
       </tr>
     {% endfor %}

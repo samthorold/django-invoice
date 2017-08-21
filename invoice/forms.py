@@ -24,7 +24,9 @@ class InvoiceLineForm(forms.ModelForm):
     class Meta:
         model = InvoiceLine
         # add the Invoice from the view
-        fields = ('patient', 'work_type', 'fee', 'quantity', 'date', 'billable')
+        fields = (
+            'patient', 'work_type', 'fee', 'quantity', 'start_date', 'billable', 'invoice_sent_date'
+        )
 
 class PaymentForm(forms.ModelForm):
 

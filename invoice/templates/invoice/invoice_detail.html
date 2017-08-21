@@ -17,8 +17,9 @@
         <th class="text-left">Work Type</th>
         <th class="text-right">#</th>
         <th class="text-right">Fee</th>
-        <th class="text-center">Date</th>
+        <th class="text-center">Start Date</th>
         <th class="text-center">Billable</th>
+        <th class="text-center">Invoice Sent</th>
       </tr>
     </thead>
     <tbody>
@@ -28,13 +29,19 @@
           <td class="text-left">{{ il.work_type.name }}</td>
           <td class="text-right">{{ il.quantity }}</td>
           <td class="text-right">{{ il.fee|intcomma }}</td>
-          <td class="text-center">{{ il.date }}</td>
+          <td class="text-center">{{ il.start_date }}</td>
           <td class="text-center">
             {% if il.billable %}
               <span class="glyphicon glyphicon-ok"></span>
             {% else %}
               <span class="glyphicon glyphicon-remove"></span>
             {% endif %}
+          </td>
+          <td class="text-center">{{ il.invoice_sent_date }}</td>
+          <td class="text-center">
+            <a class="btn btn-default" href="{% url 'invoice:invoice_line_send_invoice_now' pk=il.id %}">
+              <span class="glyphicon glyphicon-envelope"></span>
+            </a>
           </td>
           <td class="text-center">
             <a class="btn btn-warning" href="{% url 'invoice:invoice_line_edit' pk=il.id %}">

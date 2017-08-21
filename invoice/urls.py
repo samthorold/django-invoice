@@ -14,6 +14,7 @@ urlpatterns = [
 	url(r'^(?P<pk>[0-9]+)/delete/$', views.invoice_delete, name='invoice_delete'),
 
 	url(r'^(?P<invoice_pk>[0-9]+)/invoice_line_new/$', views.invoice_line_new, name='invoice_line_new'),
+	url(r'^lines/(?P<pk>[0-9]+)/send/$', views.invoice_line_send_invoice_now, name='invoice_line_send_invoice_now'),
 	url(r'^lines/(?P<pk>[0-9]+)/edit/$', views.invoice_line_edit, name='invoice_line_edit'),
 	url(r'^lines/(?P<pk>[0-9]+)/delete/$', views.invoice_line_delete, name='invoice_line_delete'),
 

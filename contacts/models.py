@@ -1,5 +1,5 @@
 from django.db import models
-from invoice.models import Payment
+
 
 class Contact(models.Model):
 
@@ -11,9 +11,11 @@ class Contact(models.Model):
 	def __str__(self):
 		return self.name
 
-	@property
-	def payments(self):
-		return Payment.objects.filter(invoice__payee=self)
-
 	def total_payments(self, start=None, end=None):
 		return sum(i.total_payment(start, end) for i in self.invoice_set.all())
+
+	def total_fees(self, start=None, end=None):
+		return sum(i.total_fee(start, end) for i in self.invoice_set.all())
+
+	def total_invoiced(self, start=None, end=None):
+		return sum(i.total_invoiced(start, end) for i in self.invoice_set.all())

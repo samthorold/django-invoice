@@ -20,6 +20,8 @@
     <tr>
       <th class="text-left">Payee</th>
       <th class="text-right">Payments</th>
+      <th class="text-right">Total Invoiced</th>
+      <th class="text-right">Total Fees</th>
     </tr>
   </thead>
   <tbody>
@@ -29,6 +31,8 @@
           {{ payee.0 }}
         </td>
         <td class="text-right">{{ payee.1|intcomma }}</td>
+        <td class="text-right">{{ payee.2|intcomma }}</td>
+        <td class="text-right">{{ payee.3|intcomma }}</td>
       </tr>
     {% endfor %}
   </tbody>
