@@ -27,7 +27,7 @@
           <td class="text-left">{{ il.patient.name }}</td>
           <td class="text-left">{{ il.work_type.name }}</td>
           <td class="text-right">{{ il.quantity }}</td>
-          <td class="text-right">{{ il.fee }}</td>
+          <td class="text-right">{{ il.fee|intcomma }}</td>
           <td class="text-center">{{ il.date }}</td>
           <td class="text-center">
             {% if il.billable %}
@@ -67,7 +67,7 @@
       {% for p in invoice.payment_set.all %}
         <tr>
           <td class="text-center">{{ p.date }}</td>
-          <td class="text-right">{{ p.amount }}</td>
+          <td class="text-right">{{ p.amount|intcomma }}</td>
           <td class="text-center">
             <a class="btn btn-warning" href="{% url 'invoice:payment_edit' pk=p.id %}">
               <span class="glyphicon glyphicon-pencil"></span>

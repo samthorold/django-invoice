@@ -45,7 +45,7 @@ class Invoice(models.Model):
 class InvoiceLine(models.Model):
 
 	class Meta:
-		ordering = ('-billable', 'work_type')
+		ordering = ('-billable', 'work_type', '-date')
 
 	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 	work_type = models.ForeignKey(WorkType)
@@ -66,7 +66,7 @@ class InvoiceLine(models.Model):
 class Payment(models.Model):
 
 	class Meta:
-		ordering = ('date', 'amount')
+		ordering = ('-date', 'amount')
 
 	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 	date = models.DateField(default=timezone.now)

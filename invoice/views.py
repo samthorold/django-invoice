@@ -13,6 +13,7 @@ from .models import Invoice, InvoiceLine, Payment, WorkType
 from contacts.models import Contact
 
 
+@login_required
 def invoice_list(request):
     invoices = Invoice.objects.order_by('-id')
     payee = request.GET.get('payee')
@@ -39,6 +40,7 @@ def invoice_list(request):
     return render(request, 'invoice/invoice_list.html',
         {'invoices': invoices, 'patient': patient, 'payee': payee})
 
+@login_required
 def invoice_new(request):
     if request.method == 'POST':
         form = InvoiceForm(request.POST)
@@ -50,6 +52,7 @@ def invoice_new(request):
         form = InvoiceForm()
         return render(request, 'invoice/invoice_new.html', {'form': form})
 
+@login_required
 def invoice_search(request):
     if request.method == 'POST':
         form = InvoiceSearchForm(request.POST)
@@ -63,10 +66,12 @@ def invoice_search(request):
         form = InvoiceSearchForm()
         return render(request, 'invoice/invoice_search.html', {'form': form})
 
+@login_required
 def invoice_detail(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     return render(request, 'invoice/invoice_detail.html', {'invoice': invoice})
 
+@login_required
 def invoice_edit(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     if request.method == 'POST':
@@ -79,6 +84,7 @@ def invoice_edit(request, pk):
         form = InvoiceForm(instance=invoice)
         return render(request, 'invoice/invoice_edit.html', {'form': form})
 
+@login_required
 def invoice_delete(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
     if request.method == 'POST':
@@ -98,6 +104,7 @@ def invoice_delete(request, pk):
         return render(request, 'invoice/invoice_delete.html',
             {'form': form, 'invoice': invoice})
 
+@login_required
 def invoice_line_new(request, invoice_pk):
     invoice = get_object_or_404(Invoice, pk=invoice_pk)
     if request.method == 'POST':
@@ -113,6 +120,7 @@ def invoice_line_new(request, invoice_pk):
         form = InvoiceLineForm()
         return render(request, 'invoice/invoice_line_new.html', {'form': form})
 
+@login_required
 def invoice_line_edit(request, pk):
     invoice_line = get_object_or_404(InvoiceLine, pk=pk)
     if request.method == 'POST':
@@ -125,7 +133,7 @@ def invoice_line_edit(request, pk):
         form = InvoiceLineForm(instance=invoice_line)
         return render(request, 'invoice/invoice_line_edit.html', {'form': form})
 
-
+@login_required
 def invoice_line_delete(request, pk):
     invoice_line = get_object_or_404(InvoiceLine, pk=pk)
     if request.method == 'POST':
@@ -145,14 +153,17 @@ def invoice_line_delete(request, pk):
         return render(request, 'invoice/invoice_line_delete.html',
             {'form': form, 'invoice_line': invoice_line})
 
+@login_required
 def worktype_list(request):
     start = request.GET.get('start')
     end = request.GET.get('end')
     worktypes = [(w, w.total_fees(start, end)) for w in WorkType.objects.all()]
-    worktypes = [worktype_tuple for worktype_tuple in worktypes if worktype_tuple[1]>0]
+    # Show all worktypes so they can be edited
+    # worktypes = [worktype_tuple for worktype_tuple in worktypes if worktype_tuple[1]>0]
     return render(request, 'invoice/worktype_list.html',
         {'worktypes': worktypes, 'start': start, 'end': end})
 
+@login_required
 def worktype_new(request):
     if request.method == 'POST':
         form = WorkTypeForm(request.POST)
@@ -164,6 +175,7 @@ def worktype_new(request):
         form = WorkTypeForm()
         return render(request, 'invoice/worktype_new.html', {'form': form})
 
+@login_required
 def worktype_search(request):
     if request.method == 'POST':
         form = WorkTypeSearchForm(request.POST)
@@ -177,10 +189,12 @@ def worktype_search(request):
         form = WorkTypeSearchForm()
         return render(request, 'invoice/worktype_search.html', {'form': form})
 
+@login_required
 def worktype_detail(request, pk):
     worktype = get_object_or_404(WorkType, pk=pk)
     return render(request, 'invoice/worktype_detail.html', {'worktype': worktype})
 
+@login_required
 def worktype_edit(request, pk):
     worktype = get_object_or_404(WorkType, pk=pk)
     if request.method == 'POST':
@@ -193,6 +207,7 @@ def worktype_edit(request, pk):
         form = WorkTypeForm(instance=worktype)
         return render(request, 'invoice/worktype_edit.html', {'form': form})
 
+@login_required
 def worktype_delete(request, pk):
     worktype = get_object_or_404(WorkType, pk=pk)
     if request.method == 'POST':
@@ -212,6 +227,7 @@ def worktype_delete(request, pk):
         return render(request, 'invoice/worktype_delete.html',
             {'form': form, 'worktype': worktype})
 
+@login_required
 def payment_list(request):
     """
     Payments by Payee
@@ -224,6 +240,7 @@ def payment_list(request):
     return render(request, 'invoice/payment_list.html',
         {'payees': payees, 'start': start, 'end': end})
 
+@login_required
 def payment_new(request, invoice_pk):
     invoice = get_object_or_404(Invoice, pk=invoice_pk)
     if request.method == 'POST':
@@ -239,6 +256,7 @@ def payment_new(request, invoice_pk):
         form = PaymentForm()
         return render(request, 'invoice/payment_new.html', {'form': form})
 
+@login_required
 def payment_search(request):
     if request.method == 'POST':
         form = PaymentSearchForm(request.POST)
@@ -252,6 +270,7 @@ def payment_search(request):
         form = PaymentSearchForm()
         return render(request, 'invoice/payment_search.html', {'form': form})
 
+@login_required
 def payment_edit(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
     if request.method == 'POST':
@@ -264,6 +283,7 @@ def payment_edit(request, pk):
         form = PaymentForm(instance=payment)
         return render(request, 'invoice/payment_edit.html', {'form': form})
 
+@login_required
 def payment_delete(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
     if request.method == 'POST':

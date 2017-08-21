@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
   <a class="btn btn-warning" href="{% url 'invoice:worktype_edit' pk=worktype.id %}">
@@ -8,5 +9,44 @@
     <span class="glyphicon glyphicon-trash"></span>
   </a>
   <h2>{{ worktype }}</h2>
-
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-left">Patient</th>
+        <th class="text-left">Work Type</th>
+        <th class="text-right">#</th>
+        <th class="text-right">Fee</th>
+        <th class="text-center">Date</th>
+        <th class="text-center">Billable</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for il in worktype.invoiceline_set.all %}
+        <tr>
+          <td class="text-left">{{ il.patient.name }}</td>
+          <td class="text-left">{{ il.work_type.name }}</td>
+          <td class="text-right">{{ il.quantity }}</td>
+          <td class="text-right">{{ il.fee|intcomma }}</td>
+          <td class="text-center">{{ il.date }}</td>
+          <td class="text-center">
+            {% if il.billable %}
+              <span class="glyphicon glyphicon-ok"></span>
+            {% else %}
+              <span class="glyphicon glyphicon-remove"></span>
+            {% endif %}
+          </td>
+          <td class="text-center">
+            <a class="btn btn-warning" href="{% url 'invoice:invoice_line_edit' pk=il.id %}">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
+          </td>
+          <td class="text-center">
+            <a class="btn btn-danger" href="{% url 'invoice:invoice_line_delete' pk=il.id %}">
+              <span class="glyphicon glyphicon-trash"></span>
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

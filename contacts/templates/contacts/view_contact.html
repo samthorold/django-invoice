@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
   <a class="btn btn-warning" href="{% url 'contacts:edit_contact' id=contact.id %}">
