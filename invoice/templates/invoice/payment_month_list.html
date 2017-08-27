@@ -4,37 +4,27 @@
 {% block content %}
 <h2>
   Payments
-  <a href="{% url 'invoice:payment_search' %}">
-    <span class="glyphicon glyphicon-filter"></span>
-  </a>
-
-  {% if start %}
-    <small>Start: </small>{{ start }}  
-  {% endif %}
-  {% if end %}
-    <small>End: </small>{{ end }}
-  {% endif %}
   <br />
-  <a href="{% url 'invoice:payment_month_list' %}"><small>By Month</small></a>
+  <a href="{% url 'invoice:payment_list' %}"><small>By Payee</small></a>
 </h2>
 <table class="table">
   <thead>
     <tr>
-      <th class="text-left">Payee</th>
+      <th class="text-left">Month</th>
       <th class="text-right">Payments</th>
       <th class="text-right">Total Invoiced</th>
       <th class="text-right">Total Fees</th>
     </tr>
   </thead>
   <tbody>
-    {% for payee in payees %}
+    {% for date in dates %}
       <tr>
         <td class="text-left">
-          {{ payee.0 }}
+          {{ date.year }}-{{ date.month }}
         </td>
-        <td class="text-right">{{ payee.1|intcomma }}</td>
-        <td class="text-right">{{ payee.2|intcomma }}</td>
-        <td class="text-right">{{ payee.3|intcomma }}</td>
+        <td class="text-right">{{ date.payments|intcomma }}</td>
+        <td class="text-right">{{ date.invoiced|intcomma }}</td>
+        <td class="text-right">{{ date.fees|intcomma }}</td>
       </tr>
     {% endfor %}
     <tr>

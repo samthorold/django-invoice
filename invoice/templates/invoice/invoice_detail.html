@@ -37,10 +37,21 @@
               <span class="glyphicon glyphicon-remove"></span>
             {% endif %}
           </td>
-          <td class="text-center">{{ il.invoice_sent_date }}</td>
+          <td class="text-center">
+            {% if il.invoice_sent_date %}
+              {{ il.invoice_sent_date }}
+            {% else %}
+              <span class="glyphicon glyphicon-remove"></span>
+            {% endif %}
+          </td>
           <td class="text-center">
             <a class="btn btn-default" href="{% url 'invoice:invoice_line_send_invoice_now' pk=il.id %}">
               <span class="glyphicon glyphicon-envelope"></span>
+            </a>
+          </td>
+          <td class="text-center">
+            <a class="btn btn-success" href="{% url 'invoice:invoice_line_paid_now' pk=il.id %}">
+              <span class="glyphicon glyphicon-gbp"></span>
             </a>
           </td>
           <td class="text-center">

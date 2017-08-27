@@ -163,8 +163,28 @@ def invoice_line_send_invoice_now(request, pk):
     return redirect('invoice:invoice_detail', pk=invoice_line.invoice.id)
 
 @login_required
+def invoice_line_paid_now(request, pk):
+    invoice_line = get_object_or_404(InvoiceLine, pk=pk)
+
+    payment = Payment(
+        amount=invoice_line.total_fee(),
+        date=timezone.now(),
+        invoice=invoice_line.invoice
+    )
+
+    payment.save()
+    messages.success(request, 'Success, changes were saved :)')
+    return redirect('invoice:invoice_detail', pk=invoice_line.invoice.id)
+
+@login_required
 def worktype_list(request):
     start = request.GET.get('start')
+    if not start:
+        now = timezone.now()
+        year = now.year - 1
+        month = now.month
+        day = now.day
+        start = "{}-{}-{}".format(year, month, day)
     end = request.GET.get('end')
     worktypes = [(w, w.total_fees(start, end)) for w in WorkType.objects.all()]
     # Show all worktypes so they can be edited
@@ -243,16 +263,71 @@ def payment_list(request):
     """
 
     start = request.GET.get('start')
+    if not start:
+        now = timezone.now()
+        year = now.year - 1
+        month = now.month
+        day = now.day
+        start = "{}-{}-{}".format(year, month, day)
     end = request.GET.get('end')
     payees = [
-        (c, c.total_payments(start, end), c.total_invoiced(start, end), c.total_fees(start, end))
+        [c, c.total_payments(start, end), c.total_invoiced(start, end), c.total_fees(start, end)]
         for c in Contact.objects.all()
     ]
 
-    payees = [payment_tuple for payment_tuple in payees if payment_tuple[1]>0]
+    payees = [payment_tuple for payment_tuple in payees if payment_tuple[3]>0]
 
-    return render(request, 'invoice/payment_list.html',
-        {'payees': payees, 'start': start, 'end': end})
+    # "Outstanding" fees
+    for payee in payees:
+        payee.append(payee[3] - payee[1])
+
+    total_payments = sum(p[1] for p in payees)
+    total_invoiced = sum(p[2] for p in payees)
+    total_fees = sum(p[3] for p in payees)
+
+    payees = sorted(payees, key=lambda payee: payee[4])
+
+    return render(
+        request, 'invoice/payment_list.html',
+        {
+            'payees': payees, 'start': start, 'end': end, 'total_payments': total_payments,
+            'total_invoiced': total_invoiced, 'total_fees': total_fees
+        }
+    )
+
+@login_required
+def payment_month_list(request):
+    now = timezone.now()
+    dates = [{'year': now.year, 'month': now.month},]
+    for i in range(11):
+        if dates[-1]['month'] == 1:
+            dates.append({'year': dates[-1]['year']-1, 'month': 12})
+        else:
+            dates.append({'year': dates[-1]['year'], 'month': dates[-1]['month']-1})
+
+    for i, date in enumerate(dates):
+        date['payments'] = sum(
+            p.amount for p in Payment.objects.filter(
+                date__year=date['year'], date__month=date['month']
+            )
+        )
+        date['invoiced'] = sum(
+            il.total_fee() for il in InvoiceLine.objects.filter(
+                invoice_sent_date__year=date['year'], invoice_sent_date__month=date['month']
+            )
+        )
+        date['fees'] = sum(
+            il.total_fee() for il in InvoiceLine.objects.filter(
+                start_date__year=date['year'], start_date__month=date['month']
+            )
+        )
+    total_payments = sum(date['payments'] for date in dates)
+    total_invoiced = sum(date['invoiced'] for date in dates)
+    total_fees = sum(date['fees'] for date in dates)
+    return render(request, 'invoice/payment_month_list.html',
+        {'dates': dates, 'total_payments': total_payments, 'total_invoiced':total_invoiced,
+         'total_fees': total_fees})
+
 
 @login_required
 def payment_new(request, invoice_pk):
