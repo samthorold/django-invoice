@@ -275,7 +275,8 @@ def payment_list(request):
         for c in Contact.objects.all()
     ]
 
-    payees = [payment_tuple for payment_tuple in payees if payment_tuple[3]>0]
+    payees = [payment_tuple for payment_tuple in payees if
+              ((payment_tuple[1]>0) | (payment_tuple[2]>0) | (payment_tuple[3]>0))]
 
     # "Outstanding" fees
     for payee in payees:
@@ -285,7 +286,7 @@ def payment_list(request):
     total_invoiced = sum(p[2] for p in payees)
     total_fees = sum(p[3] for p in payees)
 
-    payees = sorted(payees, key=lambda payee: payee[4])
+    payees = sorted(payees, key=lambda payee: -payee[4])
 
     return render(
         request, 'invoice/payment_list.html',
