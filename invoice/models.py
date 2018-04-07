@@ -67,7 +67,7 @@ class InvoiceLine(models.Model):
 	quantity = models.IntegerField()
 	fee = models.IntegerField()
 	start_date = models.DateField(default=timezone.now)
-	billable = models.BooleanField()
+	billable = models.BooleanField(default=True)
 	invoice_sent_date = models.DateField(blank=True, null=True)
 
 	def __str__(self):

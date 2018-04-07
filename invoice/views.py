@@ -166,13 +166,13 @@ def invoice_line_send_invoice_now(request, pk):
 @login_required
 def invoice_line_paid_now(request, pk):
     invoice_line = get_object_or_404(InvoiceLine, pk=pk)
-
+    invoice_line.invoice_sent_date = timezone.now()
     payment = Payment(
         amount=invoice_line.total_fee(),
         date=timezone.now(),
         invoice=invoice_line.invoice
     )
-
+    invoice_line.save()
     payment.save()
     messages.success(request, 'Success, changes were saved :)')
     return redirect('invoice:invoice_detail', pk=invoice_line.invoice.id)
