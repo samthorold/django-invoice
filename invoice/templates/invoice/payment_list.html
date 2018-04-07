@@ -30,7 +30,9 @@
     {% for payee in payees %}
       <tr>
         <td class="text-left">
-          {{ payee.0 }}
+          <a href="{% url 'invoice:invoice_list' %}?payee={{ payee.0 }}">
+            {{ payee.0 }}
+          </a>
         </td>
         <td class="text-right">{{ payee.1|intcomma }}</td>
         <td class="text-right">{{ payee.2|intcomma }}</td>

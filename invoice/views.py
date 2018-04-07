@@ -17,6 +17,7 @@ from contacts.models import Contact
 @login_required
 def invoice_list(request):
     invoices = Invoice.objects.order_by('-id')
+    # https://stackoverflow.com/questions/4591525/is-it-possible-to-pass-query-parameters-via-djangos-url-template-tag
     payee = request.GET.get('payee')
     if payee:
         invoices = invoices.filter(payee__name__icontains=payee)
