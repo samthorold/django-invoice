@@ -45,14 +45,18 @@
             {% endif %}
           </td>
           <td class="text-center">
+            <% if il.billable %>
             <a class="btn btn-default" href="{% url 'invoice:invoice_line_send_invoice_now' pk=il.id %}">
               <span class="glyphicon glyphicon-envelope"></span>
             </a>
+            <% endif %>
           </td>
           <td class="text-center">
+            <% if il.billable %>
             <a class="btn btn-success" href="{% url 'invoice:invoice_line_paid_now' pk=il.id %}">
               <span class="glyphicon glyphicon-gbp"></span>
             </a>
+            <% endif %>
           </td>
           <td class="text-center">
             <a class="btn btn-warning" href="{% url 'invoice:invoice_line_edit' pk=il.id %}">
