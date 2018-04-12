@@ -53,6 +53,7 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+staticfiles/
 
 # Flask stuff:
 instance/
@@ -93,7 +94,4 @@ ENV/
 # Database
 *.sqlite3
 *.db
-
-# Heroku
-local_settings.py
 
