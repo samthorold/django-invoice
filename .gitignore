@@ -93,3 +93,7 @@ ENV/
 # Database
 *.sqlite3
 *.db
+
+# Heroku
+local_settings.py
+
