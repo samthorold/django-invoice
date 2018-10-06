@@ -166,7 +166,8 @@ def invoice_line_send_invoice_now(request, pk):
 @login_required
 def invoice_line_paid_now(request, pk):
     invoice_line = get_object_or_404(InvoiceLine, pk=pk)
-    invoice_line.invoice_sent_date = timezone.now()
+    if not invoice_line.invoice_sent_date:
+        invoice_line.invoice_sent_date = timezone.now()
     payment = Payment(
         amount=invoice_line.total_fee(),
         date=timezone.now(),
