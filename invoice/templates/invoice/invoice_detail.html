@@ -52,7 +52,7 @@
             {% endif %}
           </td>
           <td class="text-center">
-              {% if il.billable and (il.invoice.fee_outstanding > 0) %}
+              {% if il.billable and il.invoice.fee_outstanding > 0 %}
             <a class="btn btn-success" href="{% url 'invoice:invoice_line_paid_now' pk=il.id %}">
               <span class="glyphicon glyphicon-gbp"></span>
             </a>
