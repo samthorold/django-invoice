@@ -18,6 +18,10 @@ class InvoiceForm(forms.ModelForm):
 class InvoiceSearchForm(forms.Form):
     payee_name = forms.CharField(required=False, max_length=200)
     patient_name = forms.CharField(required=False, max_length=200)
+    payment_start = forms.DateField(required=False)
+    payment_end = forms.DateField(required=False)
+    work_start = forms.DateField(required=False)
+    work_end = forms.DateField(required=False)
 
 class InvoiceLineForm(forms.ModelForm):
 
@@ -36,8 +40,12 @@ class PaymentForm(forms.ModelForm):
         fields = ('date', 'amount')
 
 class PaymentSearchForm(forms.Form):
-    start = forms.DateField(required=False)
-    end = forms.DateField(required=False)
+    payee_name = forms.CharField(required=False, max_length=200)
+    patient_name = forms.CharField(required=False, max_length=200)
+    payment_start = forms.DateField(required=False)
+    payment_end = forms.DateField(required=False)
+    work_start = forms.DateField(required=False)
+    work_end = forms.DateField(required=False)
 
 class WorkTypeSearchForm(forms.Form):
     start = forms.DateField(required=False)

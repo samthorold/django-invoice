@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -5,6 +7,8 @@ from django.utils import timezone
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+
+from dateutil.parser import parse as dtparse
 
 from .forms import (
     DeleteForm, InvoiceForm, InvoiceLineForm, InvoiceSearchForm,
@@ -14,36 +18,69 @@ from .models import Invoice, InvoiceLine, Payment, WorkType
 from contacts.models import Contact
 
 
+def wrangle_paginator(qry, page, n=10):
+    paginator = Paginator(qry, n)
+    try:
+        return paginator.page(page)
+    except PageNotAnInteger:
+        return paginator.page(1)
+    except EmptyPage:
+        return paginator.page(paginator.num_pages)
+
 @login_required
 def invoice_list(request):
-    invoices = Invoice.objects.order_by('-id')
+
+    invoices = Invoice.objects.order_by(request.GET.get("order", "-id"))
+
     # https://stackoverflow.com/questions/4591525/is-it-possible-to-pass-query-parameters-via-djangos-url-template-tag
     payee = request.GET.get('payee')
     if payee:
         invoices = invoices.filter(payee__name__icontains=payee)
+
     patient = request.GET.get('patient')
     if patient:
         # https://stackoverflow.com/questions/15507171/django-filter-query-foreign-key
         invoices = invoices.filter(invoiceline__patient__name__icontains=patient)
-    # if not (payee or patient):
-    #     invoices = invoices.all()
+
+    work_start = request.GET.get('work_start')
+    if work_start:
+        work_start = dtparse(work_start)
+        invoices = invoices.filter(invoiceline__start_date__gte=work_start)
+
+    work_end = request.GET.get('work_end')
+    if work_end:
+        work_end = dtparse(work_end)
+        invoices = invoices.filter(invoiceline__start_date__lt=work_end)
+
+    payment_start = request.GET.get('payment_start')
+    if payment_start:
+        payment_start = dtparse(payment_start)
+        invoices = invoices.filter(payment__date__gte=payment_start)
+
+    payment_end = request.GET.get('payment_end')
+    if payment_end:
+        payment_end = dtparse(payment_end)
+        invoices = invoices.filter(payment__date__lt=payment_end)
 
     # https://stackoverflow.com/questions/5728283/
     # distinct returns only unique Invoice objects
     # the same Invoice shows up when two+ InvoiceLine objects have a matching patient name
-    paginator = Paginator(invoices.distinct(), 15)
-    page = request.GET.get('page')
-    try:
-        invoices = paginator.page(page)
-    except PageNotAnInteger:
-        invoices = paginator.page(1)
-    except EmptyPage:
-        invoices = paginator.page(paginator.num_pages)
-    return render(request, 'invoice/invoice_list.html',
-        {'invoices': invoices, 'patient': patient, 'payee': payee})
+    # or when two+ InvoiceLine objects have matching start/end dates
+    invoices_lst = Paginator(invoices.distinct())
+
+    context = {'invoices': invoices_lst, 'patient': patient, 'payee': payee}
+    return render(request, 'invoice/invoice_list.html', context)
 
 @login_required
 def invoice_new(request):
+    """
+    Get the full name of the payee as a string.
+    Assuming the full name is unique (or this is enforced at the database level),
+    try to find the full name in existing contacts.
+    If the full name is not found,
+    create a new contact with that full name and use the new contact as the payee.
+    """
+
     if request.method == 'POST':
         form = InvoiceForm(request.POST)
         if form.is_valid():
@@ -51,22 +88,22 @@ def invoice_new(request):
             messages.success(request, 'Success, new invoice created :)')
             return redirect('invoice:invoice_detail', pk=invoice.id)
     else:
-        form = InvoiceForm()
-        return render(request, 'invoice/invoice_new.html', {'form': form})
+        context = {'form': InvoiceForm()}
+        return render(request, 'invoice/invoice_new.html', context)
 
 @login_required
 def invoice_search(request):
     if request.method == 'POST':
         form = InvoiceSearchForm(request.POST)
         if form.is_valid():
-            payee = form.cleaned_data.get('payee_name')
-            patient = form.cleaned_data.get('patient_name')
-            url = reverse('invoice:invoice_list')
-            url = "{}?payee={}&patient={}".format(url, payee, patient)
-            return HttpResponseRedirect(url)
+            redirect_url = reverse('invoice:invoice_list')
+            keys = ["payee", "patient", "work_start", "work_end", "payment_start", "payment_end"]
+            vals = [form.cleaned_data.get(k) for k in keys]
+            params = urlencode(dict((k, v) for k, v in zip(keys, vals) if v))
+            return HttpResponseRedirect("{}?{}".format(redirect_url, params))
     else:
-        form = InvoiceSearchForm()
-        return render(request, 'invoice/invoice_search.html', {'form': form})
+        context = {"form": InvoiceSearchForm()}
+        return render(request, 'invoice/invoice_search.html', context)
 
 @login_required
 def invoice_detail(request, pk):
@@ -108,6 +145,16 @@ def invoice_delete(request, pk):
 
 @login_required
 def invoice_line_new(request, invoice_pk):
+    """
+    Get the full name of the patient as a string.
+    Assuming the full name is unique (or this is enforced at the database level),
+    try to find the full name in existing contacts.
+    If the full name is not found,
+    create a new contact with that full name and use the new contact as the patient.
+
+    As above for worktype.
+    """
+
     invoice = get_object_or_404(Invoice, pk=invoice_pk)
     if request.method == 'POST':
         form = InvoiceLineForm(request.POST)
@@ -277,8 +324,7 @@ def payment_list(request):
         for c in Contact.objects.all()
     ]
 
-    payees = [payment_tuple for payment_tuple in payees if
-              ((payment_tuple[1]>0) | (payment_tuple[2]>0) | (payment_tuple[3]>0))]
+    payees = [payment_tuple for payment_tuple in payees if any(payment_tuple)]
 
     # "Outstanding" fees
     for payee in payees:
